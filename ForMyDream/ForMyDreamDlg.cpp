@@ -20,6 +20,7 @@ CForMyDreamDlg::CForMyDreamDlg(CWnd* pParent /*=NULL*/)
     : CDialogEx(IDD_FORMYDREAM_DIALOG, pParent)
     , m_bySleepTime(-1)
     , m_iTimeBase(-1)
+    , m_bIsStart(false)
 {
     m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -95,18 +96,24 @@ HCURSOR CForMyDreamDlg::OnQueryDragIcon()
 
 void CForMyDreamDlg::OnBnClickedOk()
 {
-    if (-1 == m_iTimeBase)
+    if (!m_bIsStart)
     {
-        MessageBox(_T("请选择周期单位"), _T("Just for my dream!"), MB_OK | MB_ICONERROR);
-        return;
+        if (-1 == m_iTimeBase)
+        {
+            MessageBox(_T("请选择周期单位"), _T("Just for my dream!"), MB_OK | MB_ICONERROR);
+            return;
+        }
+        int iInputNum = getTextNum();
+        if (-1 == getTextNum())
+        {
+            MessageBox(_T("请输入周期"), _T("Just for my dream!"), MB_OK | MB_ICONERROR);
+            return;
+        }
+        m_bySleepTime = m_iTimeBase * 1000 * iInputNum;
+        SetDlgItemText(IDOK, _T("暂停"));
+        setTextRadioEnable(FALSE);
     }
-    int iInputNum = getTextNum();
-    if(-1==getTextNum())
-    {
-        MessageBox(_T("请输入周期"), _T("Just for my dream!"), MB_OK | MB_ICONERROR);
-        return;
-    }
-    m_bySleepTime = m_iTimeBase * 1000 * iInputNum;
+
     // TODO: 
 }
 
@@ -118,6 +125,14 @@ int CForMyDreamDlg::getTextNum()
     if ("" == cstrInput)
         return -1;
     return  _ttoi(cstrInput);
+}
+
+void CForMyDreamDlg::setTextRadioEnable(BOOL __b)
+{
+    GetDlgItem(IDC_EDIT_INTERVAL)->EnableWindow(__b);
+    GetDlgItem(IDC_RADIO_SEC)->EnableWindow(__b);
+    GetDlgItem(IDC_RADIO_MIN)->EnableWindow(__b);
+    GetDlgItem(IDC_RADIO_HOUR)->EnableWindow(__b);
 }
 
 void CForMyDreamDlg::OnBnClickedRadioSec()

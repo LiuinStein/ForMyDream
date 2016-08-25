@@ -33,17 +33,19 @@ protected:
 public:
     afx_msg void OnBnClickedOk();
 private:
-    // Splash窗口的显示周期，以毫秒为单位 
-    int m_bySleepTime;
+   
+    int m_bySleepTime;  // Splash窗口的显示周期，以毫秒为单位     
+    int m_iTimeBase; // 时间基数，以秒为单位
+    bool m_bIsStart; // 当前监控状态，true为开启
 
     // 用于获取文本框数字
     int getTextNum();
+
+    // 设置单选键和文本框是否可用
+    void setTextRadioEnable(BOOL __b);
 public:
     afx_msg void OnBnClickedRadioSec();
-private:
-    // 时间基数，以秒为单位
-    int m_iTimeBase;
-public:
     afx_msg void OnBnClickedRadioMin();
     afx_msg void OnBnClickedRadioHour();
+    
 };
