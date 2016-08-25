@@ -30,4 +30,20 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+public:
+    afx_msg void OnBnClickedOk();
+private:
+    // Splash窗口的显示周期，以毫秒为单位 
+    int m_bySleepTime;
+
+    // 用于获取文本框数字
+    int getTextNum();
+public:
+    afx_msg void OnBnClickedRadioSec();
+private:
+    // 时间基数，以秒为单位
+    int m_iTimeBase;
+public:
+    afx_msg void OnBnClickedRadioMin();
+    afx_msg void OnBnClickedRadioHour();
 };
