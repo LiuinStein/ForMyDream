@@ -6,6 +6,7 @@
 #include "ForMyDream.h"
 #include "ForMyDreamDlg.h"
 #include "afxdialogex.h"
+#include "SplashDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -112,9 +113,15 @@ void CForMyDreamDlg::OnBnClickedOk()
         m_bySleepTime = m_iTimeBase * 1000 * iInputNum;
         SetDlgItemText(IDOK, _T("ÔÝÍ£"));
         setTextRadioEnable(FALSE);
+        CSplashDlg csdShow;
+        csdShow.DoModal();
     }
-
-    // TODO: 
+    else
+    {
+        SetDlgItemText(IDOK, _T("¿ªÊ¼"));
+        setTextRadioEnable(TRUE);
+    }
+    m_bIsStart = !m_bIsStart; 
 }
 
 
@@ -140,12 +147,10 @@ void CForMyDreamDlg::OnBnClickedRadioSec()
     m_iTimeBase = 1;
 }
 
-
 void CForMyDreamDlg::OnBnClickedRadioMin()
 {
     m_iTimeBase = 60;
 }
-
 
 void CForMyDreamDlg::OnBnClickedRadioHour()
 {
