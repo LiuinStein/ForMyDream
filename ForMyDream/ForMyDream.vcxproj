@@ -188,12 +188,14 @@
     <ClInclude Include="ForMyDream.h" />
     <ClInclude Include="ForMyDreamDlg.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="SplashDlg.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ForMyDream.cpp" />
     <ClCompile Include="ForMyDreamDlg.cpp" />
+    <ClCompile Include="SplashDlg.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -208,7 +210,9 @@
     <None Include="res\ForMyDream.rc2" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\bitmap1.bmp" />
     <Image Include="res\ForMyDream.ico" />
+    <Image Include="show.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
