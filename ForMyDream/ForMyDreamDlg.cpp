@@ -70,8 +70,14 @@ BOOL CForMyDreamDlg::OnInitDialog()
     SetIcon(m_hIcon, TRUE);			// 设置大图标
     SetIcon(m_hIcon, FALSE);		// 设置小图标
 
-    // TODO: 在此添加额外的初始化代码
-
+    HANDLE hObject = ::CreateMutex(NULL, FALSE, _T("Mutex20100731"));
+    if (GetLastError() == ERROR_ALREADY_EXISTS)
+    {
+        CloseHandle(hObject);
+        MessageBox(_T("这个程序已经在运行"), _T("JustForMyDream"), MB_OK | MB_ICONERROR);
+        exit(0);
+    }
+    toTray();
     return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
