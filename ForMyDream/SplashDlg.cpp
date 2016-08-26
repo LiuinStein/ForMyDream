@@ -1,4 +1,4 @@
-// SplashDlg.cpp : ÊµÏÖÎÄ¼ş
+ï»¿// SplashDlg.cpp : å®ç°æ–‡ä»¶
 //
 
 #include "stdafx.h"
@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 
 
-// CSplashDlg ¶Ô»°¿ò
+// CSplashDlg å¯¹è¯æ¡†
 
 IMPLEMENT_DYNAMIC(CSplashDlg, CDialogEx)
 
@@ -31,7 +31,7 @@ BEGIN_MESSAGE_MAP(CSplashDlg, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CSplashDlg ÏûÏ¢´¦Àí³ÌĞò
+// CSplashDlg æ¶ˆæ¯å¤„ç†ç¨‹åº
 
 
 BOOL CSplashDlg::OnInitDialog()
@@ -41,5 +41,5 @@ BOOL CSplashDlg::OnInitDialog()
     AnimateWindow(2500, AW_HIDE | AW_BLEND);
     PostMessage(WM_CLOSE);
     return TRUE;  // return TRUE unless you set the focus to a control
-                  // Òì³£: OCX ÊôĞÔÒ³Ó¦·µ»Ø FALSE
+                  // å¼‚å¸¸: OCX å±æ€§é¡µåº”è¿”å› FALSE
 }

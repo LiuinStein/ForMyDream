@@ -1,31 +1,31 @@
-
-// ForMyDreamDlg.h : Í·ÎÄ¼ş
+ï»¿
+// ForMyDreamDlg.h : å¤´æ–‡ä»¶
 //
 
 #pragma once
 
 
-// CForMyDreamDlg ¶Ô»°¿ò
+// CForMyDreamDlg å¯¹è¯æ¡†
 class CForMyDreamDlg : public CDialogEx
 {
-// ¹¹Ôì
+// æ„é€ 
 public:
-    CForMyDreamDlg(CWnd* pParent = NULL);	// ±ê×¼¹¹Ôìº¯Êı
+    CForMyDreamDlg(CWnd* pParent = NULL);	// æ ‡å‡†æ„é€ å‡½æ•°
 
-// ¶Ô»°¿òÊı¾İ
+// å¯¹è¯æ¡†æ•°æ®
 #ifdef AFX_DESIGN_TIME
     enum { IDD = IDD_FORMYDREAM_DIALOG };
 #endif
 
     protected:
-    virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV Ö§³Ö
+    virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV æ”¯æŒ
 
 
-// ÊµÏÖ
+// å®ç°
 protected:
     HICON m_hIcon;
 
-    // Éú³ÉµÄÏûÏ¢Ó³Éäº¯Êı
+    // ç”Ÿæˆçš„æ¶ˆæ¯æ˜ å°„å‡½æ•°
     virtual BOOL OnInitDialog();
     afx_msg void OnPaint();
     afx_msg HCURSOR OnQueryDragIcon();
@@ -34,17 +34,17 @@ public:
     afx_msg void OnBnClickedOk();
 private:
    
-    int m_bySleepTime;  // Splash´°¿ÚµÄÏÔÊ¾ÖÜÆÚ£¬ÒÔºÁÃëÎªµ¥Î»     
-    int m_iTimeBase; // Ê±¼ä»ùÊı£¬ÒÔÃëÎªµ¥Î»
-    bool m_bIsStart; // µ±Ç°¼à¿Ø×´Ì¬£¬trueÎª¿ªÆô
+    int m_bySleepTime;  // Splashçª—å£çš„æ˜¾ç¤ºå‘¨æœŸï¼Œä»¥æ¯«ç§’ä¸ºå•ä½     
+    int m_iTimeBase; // æ—¶é—´åŸºæ•°ï¼Œä»¥ç§’ä¸ºå•ä½
+    bool m_bIsStart; // å½“å‰ç›‘æ§çŠ¶æ€ï¼Œtrueä¸ºå¼€å¯
 
-    // ÓÃÓÚ»ñÈ¡ÎÄ±¾¿òÊı×Ö
+    // ç”¨äºè·å–æ–‡æœ¬æ¡†æ•°å­—
     int getTextNum();
 
-    // ÉèÖÃµ¥Ñ¡¼üºÍÎÄ±¾¿òÊÇ·ñ¿ÉÓÃ
+    // è®¾ç½®å•é€‰é”®å’Œæ–‡æœ¬æ¡†æ˜¯å¦å¯ç”¨
     void setTextRadioEnable(BOOL __b);
 
-    //¿ªÊ¼Õ¹Ê¾
+    //å¼€å§‹å±•ç¤º
     friend UINT startShow(LPVOID pParam);
 
 public:

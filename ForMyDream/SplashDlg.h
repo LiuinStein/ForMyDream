@@ -1,23 +1,23 @@
-#pragma once
+ï»¿#pragma once
 
 
-// CSplashDlg ¶Ô»°¿ò
+// CSplashDlg å¯¹è¯æ¡†
 
 class CSplashDlg : public CDialogEx
 {
     DECLARE_DYNAMIC(CSplashDlg)
 
 public:
-    CSplashDlg(CWnd* pParent = NULL);   // ±ê×¼¹¹Ôìº¯Êı
+    CSplashDlg(CWnd* pParent = NULL);   // æ ‡å‡†æ„é€ å‡½æ•°
     virtual ~CSplashDlg();
 
-// ¶Ô»°¿òÊı¾İ
+// å¯¹è¯æ¡†æ•°æ®
 #ifdef AFX_DESIGN_TIME
     enum { IDD = IDD_SPLASH_DIALOG };
 #endif
 
 protected:
-    virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Ö§³Ö
+    virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV æ”¯æŒ
 
     DECLARE_MESSAGE_MAP()
 public:
