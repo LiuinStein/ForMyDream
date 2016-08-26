@@ -44,6 +44,9 @@ private:
     // 设置单选键和文本框是否可用
     void setTextRadioEnable(BOOL __b);
 
+    //最小化到托盘
+    void toTray();
+
     //开始展示
     friend UINT startShow(LPVOID pParam);
 
@@ -52,4 +55,8 @@ public:
     afx_msg void OnBnClickedRadioMin();
     afx_msg void OnBnClickedRadioHour();
     
+protected:
+    afx_msg LRESULT OnShowtask(WPARAM wParam, LPARAM lParam);
+public:
+    afx_msg void OnClose();
 };

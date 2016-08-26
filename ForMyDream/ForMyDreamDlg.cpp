@@ -13,12 +13,15 @@
 #define new DEBUG_NEW
 #endif
 
+#define WM_SHOWTASK (WM_USER+1)
+
 UINT startShow(LPVOID pParam)
 {
     while (static_cast<CForMyDreamDlg*>(pParam)->m_bIsStart)
     {
         CSplashDlg csdShow;
         csdShow.DoModal();
+        ::ShowWindow(csdShow.GetSafeHwnd(), SW_SHOW);
         Sleep(static_cast<CForMyDreamDlg*>(pParam)->m_bySleepTime);
     }
     return 0;
@@ -49,6 +52,8 @@ BEGIN_MESSAGE_MAP(CForMyDreamDlg, CDialogEx)
     ON_BN_CLICKED(IDC_RADIO_SEC, &CForMyDreamDlg::OnBnClickedRadioSec)
     ON_BN_CLICKED(IDC_RADIO_MIN, &CForMyDreamDlg::OnBnClickedRadioMin)
     ON_BN_CLICKED(IDC_RADIO_HOUR, &CForMyDreamDlg::OnBnClickedRadioHour)
+    ON_MESSAGE(WM_SHOWTASK, &CForMyDreamDlg::OnShowtask)
+    ON_WM_CLOSE()
 END_MESSAGE_MAP()
 
 
@@ -121,18 +126,21 @@ void CForMyDreamDlg::OnBnClickedOk()
             MessageBox(_T("请输入周期"), _T("Just for my dream!"), MB_OK | MB_ICONERROR);
             return;
         }
+        m_bIsStart = !m_bIsStart;
         m_bySleepTime = m_iTimeBase * 1000 * iInputNum;
         SetDlgItemText(IDOK, _T("暂停"));
         setTextRadioEnable(FALSE);
         AfxBeginThread(startShow, this);
+        toTray();
+        
     }
     else
     {
+        m_bIsStart = !m_bIsStart;
         SetDlgItemText(IDOK, _T("开始"));
-        setTextRadioEnable(TRUE);
-        
+        setTextRadioEnable(TRUE);        
     }
-    m_bIsStart = !m_bIsStart; 
+    
 }
 
 
@@ -153,6 +161,20 @@ void CForMyDreamDlg::setTextRadioEnable(BOOL __b)
     GetDlgItem(IDC_RADIO_HOUR)->EnableWindow(__b);
 }
 
+void CForMyDreamDlg::toTray()
+{
+    NOTIFYICONDATA nid;
+    nid.cbSize = static_cast<DWORD>(sizeof(NOTIFYICONDATA));
+    nid.hWnd = this->m_hWnd;
+    nid.uID = IDR_MAINFRAME;
+    nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
+    nid.uCallbackMessage = WM_SHOWTASK;//自定义的消息名称 
+    nid.hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_MAINFRAME));
+    wcscpy_s(nid.szTip, L"监控程序"); //信息提示条 
+    Shell_NotifyIcon(NIM_ADD, &nid); //在托盘区添加图标 
+    ::ShowWindow(this->GetSafeHwnd(), SW_HIDE); //隐藏主窗口
+}
+
 void CForMyDreamDlg::OnBnClickedRadioSec()
 {
     m_iTimeBase = 1;
@@ -166,4 +188,39 @@ void CForMyDreamDlg::OnBnClickedRadioMin()
 void CForMyDreamDlg::OnBnClickedRadioHour()
 {
     m_iTimeBase = 3600;
+}
+
+
+afx_msg LRESULT CForMyDreamDlg::OnShowtask(WPARAM wParam, LPARAM lParam)
+{
+    if (wParam != IDR_MAINFRAME)
+        return 1;
+    switch (lParam)
+    {
+    case WM_LBUTTONDBLCLK: //双击左键的处理 
+    {
+        this->ShowWindow(SW_SHOW);//
+        NOTIFYICONDATA nid;
+        nid.cbSize = static_cast<DWORD>(sizeof(NOTIFYICONDATA));
+        nid.hWnd = this->m_hWnd;
+        nid.uID = IDR_MAINFRAME;
+        nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
+        nid.uCallbackMessage = WM_SHOWTASK; //自定义的消息名称 
+        nid.hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_MAINFRAME));
+        wcscpy_s(nid.szTip, L"Just for my dream"); //信息提示条为“计划任务提醒” 
+        Shell_NotifyIcon(NIM_DELETE, &nid); //在托盘区删除图标 
+    } break;
+    case WM_RBUTTONUP://右键起来时弹出快捷菜单 
+    {
+
+    } break;
+    default: break;
+    }
+    return 0;
+}
+
+
+void CForMyDreamDlg::OnClose()
+{
+    toTray();
 }
