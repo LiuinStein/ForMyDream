@@ -43,6 +43,10 @@ private:
 
     // 设置单选键和文本框是否可用
     void setTextRadioEnable(BOOL __b);
+
+    //开始展示
+    friend UINT startShow(LPVOID pParam);
+
 public:
     afx_msg void OnBnClickedRadioSec();
     afx_msg void OnBnClickedRadioMin();

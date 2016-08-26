@@ -8,10 +8,20 @@
 #include "afxdialogex.h"
 #include "SplashDlg.h"
 
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
+UINT startShow(LPVOID pParam)
+{
+    while (1)
+    {
+        CSplashDlg csdShow;
+        csdShow.DoModal();
+        Sleep(static_cast<CForMyDreamDlg*>(pParam)->m_bySleepTime);
+    }
+}
 
 // CForMyDreamDlg 对话框
 
@@ -113,13 +123,13 @@ void CForMyDreamDlg::OnBnClickedOk()
         m_bySleepTime = m_iTimeBase * 1000 * iInputNum;
         SetDlgItemText(IDOK, _T("暂停"));
         setTextRadioEnable(FALSE);
-        CSplashDlg csdShow;
-        csdShow.DoModal();
+        static auto wtpStartThread = AfxBeginThread(startShow, this);
     }
     else
     {
         SetDlgItemText(IDOK, _T("开始"));
         setTextRadioEnable(TRUE);
+        
     }
     m_bIsStart = !m_bIsStart; 
 }
