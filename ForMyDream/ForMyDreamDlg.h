@@ -59,4 +59,7 @@ protected:
     afx_msg LRESULT OnShowtask(WPARAM wParam, LPARAM lParam);
 public:
     afx_msg void OnClose();
+protected:
+    afx_msg LRESULT OnControlSplash(WPARAM wParam, LPARAM lParam);
+    virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 };

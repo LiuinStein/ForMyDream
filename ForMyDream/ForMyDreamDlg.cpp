@@ -14,6 +14,7 @@
 #endif
 
 #define WM_SHOWTASK (WM_USER+1)
+#define WM_CONTROLSPLASH (WM_USER+2) 
 
 UINT startShow(LPVOID pParam)
 {
@@ -54,6 +55,7 @@ BEGIN_MESSAGE_MAP(CForMyDreamDlg, CDialogEx)
     ON_BN_CLICKED(IDC_RADIO_HOUR, &CForMyDreamDlg::OnBnClickedRadioHour)
     ON_MESSAGE(WM_SHOWTASK, &CForMyDreamDlg::OnShowtask)
     ON_WM_CLOSE()
+    ON_MESSAGE(WM_CONTROLSPLASH, &CForMyDreamDlg::OnControlSplash)
 END_MESSAGE_MAP()
 
 
@@ -109,40 +111,10 @@ HCURSOR CForMyDreamDlg::OnQueryDragIcon()
     return static_cast<HCURSOR>(m_hIcon);
 }
 
-
-
 void CForMyDreamDlg::OnBnClickedOk()
 {
-    if (!m_bIsStart)
-    {
-        if (-1 == m_iTimeBase)
-        {
-            MessageBox(_T("请选择周期单位"), _T("Just for my dream!"), MB_OK | MB_ICONERROR);
-            return;
-        }
-        int iInputNum = getTextNum();
-        if (-1 == getTextNum())
-        {
-            MessageBox(_T("请输入周期"), _T("Just for my dream!"), MB_OK | MB_ICONERROR);
-            return;
-        }
-        m_bIsStart = !m_bIsStart;
-        m_bySleepTime = m_iTimeBase * 1000 * iInputNum;
-        SetDlgItemText(IDOK, _T("暂停"));
-        setTextRadioEnable(FALSE);
-        AfxBeginThread(startShow, this);
-        toTray();
-        
-    }
-    else
-    {
-        m_bIsStart = !m_bIsStart;
-        SetDlgItemText(IDOK, _T("开始"));
-        setTextRadioEnable(TRUE);        
-    }
-    
+    PostMessageW(WM_CONTROLSPLASH);
 }
-
 
 int CForMyDreamDlg::getTextNum()
 {
@@ -212,7 +184,25 @@ afx_msg LRESULT CForMyDreamDlg::OnShowtask(WPARAM wParam, LPARAM lParam)
     } break;
     case WM_RBUTTONUP://右键起来时弹出快捷菜单 
     {
-
+        LPPOINT lpoint = new tagPOINT;
+        ::GetCursorPos(lpoint);                    // 得到鼠标位置
+        CMenu menu;
+        menu.CreatePopupMenu();                    // 声明一个弹出式菜单
+        if(!m_bIsStart)
+        {
+            menu.AppendMenuW(MF_STRING | MF_ENABLED, 1001, _T("开始"));
+            menu.AppendMenuW(MF_STRING | MF_DISABLED, 1001, _T("暂停"));
+        }
+        else
+        {
+            menu.AppendMenuW(MF_STRING | MF_DISABLED, 1001, _T("开始"));
+            menu.AppendMenuW(MF_STRING | MF_ENABLED, 1001, _T("暂停"));
+        }
+        menu.AppendMenuW(MF_STRING | MF_ENABLED, WM_DESTROY, _T("关闭"));
+        menu.TrackPopupMenu(TPM_LEFTALIGN, lpoint->x, lpoint->y, this);
+        HMENU hmenu = menu.Detach();
+        menu.DestroyMenu();
+        delete lpoint;
     } break;
     default: break;
     }
@@ -223,4 +213,45 @@ afx_msg LRESULT CForMyDreamDlg::OnShowtask(WPARAM wParam, LPARAM lParam)
 void CForMyDreamDlg::OnClose()
 {
     toTray();
+}
+
+
+afx_msg LRESULT CForMyDreamDlg::OnControlSplash(WPARAM wParam, LPARAM lParam)
+{
+    if (!m_bIsStart)
+    {
+        if (-1 == m_iTimeBase)
+        {
+            MessageBox(_T("请选择周期单位"), _T("Just for my dream!"), MB_OK | MB_ICONERROR);
+            return 1;
+        }
+        int iInputNum = getTextNum();
+        if (-1 == getTextNum())
+        {
+            MessageBox(_T("请输入周期"), _T("Just for my dream!"), MB_OK | MB_ICONERROR);
+            return 1;
+        }
+        m_bIsStart = !m_bIsStart;
+        m_bySleepTime = m_iTimeBase * 1000 * iInputNum;
+        SetDlgItemText(IDOK, _T("暂停"));
+        setTextRadioEnable(FALSE);
+        AfxBeginThread(startShow, this);
+        toTray();
+
+    }
+    else
+    {
+        m_bIsStart = !m_bIsStart;
+        SetDlgItemText(IDOK, _T("开始"));
+        setTextRadioEnable(TRUE);
+    }
+    return 0;
+}
+
+
+BOOL CForMyDreamDlg::OnCommand(WPARAM wParam, LPARAM lParam)
+{
+    if (wParam == 1001)
+        PostMessageW(WM_CONTROLSPLASH);
+    return CDialogEx::OnCommand(wParam, lParam);
 }
