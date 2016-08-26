@@ -190,15 +190,16 @@ afx_msg LRESULT CForMyDreamDlg::OnShowtask(WPARAM wParam, LPARAM lParam)
         menu.CreatePopupMenu();                    // 声明一个弹出式菜单
         if(!m_bIsStart)
         {
-            menu.AppendMenuW(MF_STRING | MF_ENABLED, 1001, _T("开始"));
-            menu.AppendMenuW(MF_STRING | MF_DISABLED, 1001, _T("暂停"));
+            menu.AppendMenuW(MF_STRING | MF_ENABLED, 10001, _T("开始"));
+            menu.AppendMenuW(MF_STRING | MF_DISABLED, 10001, _T("暂停"));
         }
         else
         {
-            menu.AppendMenuW(MF_STRING | MF_DISABLED, 1001, _T("开始"));
-            menu.AppendMenuW(MF_STRING | MF_ENABLED, 1001, _T("暂停"));
+            menu.AppendMenuW(MF_STRING | MF_DISABLED, 10001, _T("开始"));
+            menu.AppendMenuW(MF_STRING | MF_ENABLED, 10001, _T("暂停"));
         }
         menu.AppendMenuW(MF_STRING | MF_ENABLED, WM_DESTROY, _T("关闭"));
+        SetForegroundWindow();
         menu.TrackPopupMenu(TPM_LEFTALIGN, lpoint->x, lpoint->y, this);
         HMENU hmenu = menu.Detach();
         menu.DestroyMenu();
@@ -251,7 +252,7 @@ afx_msg LRESULT CForMyDreamDlg::OnControlSplash(WPARAM wParam, LPARAM lParam)
 
 BOOL CForMyDreamDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 {
-    if (wParam == 1001)
+    if (wParam == 10001)
         PostMessageW(WM_CONTROLSPLASH);
     return CDialogEx::OnCommand(wParam, lParam);
 }
