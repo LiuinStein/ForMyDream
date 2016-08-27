@@ -37,6 +37,8 @@ END_MESSAGE_MAP()
 BOOL CSplashDlg::OnInitDialog()
 {
     CDialogEx::OnInitDialog();
+    BringWindowToTop();
+    CenterWindow(GetDesktopWindow());
     AnimateWindow(2500, AW_ACTIVATE | AW_BLEND);
     AnimateWindow(2500, AW_HIDE | AW_BLEND);
     PostMessage(WM_CLOSE);
