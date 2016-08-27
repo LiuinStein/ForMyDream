@@ -66,4 +66,6 @@ protected:
     afx_msg LRESULT OnShowtask(WPARAM wParam, LPARAM lParam);  
     afx_msg LRESULT OnControlSplash(WPARAM wParam, LPARAM lParam);
     virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
+public:
+    virtual BOOL PreTranslateMessage(MSG* pMsg);
 };

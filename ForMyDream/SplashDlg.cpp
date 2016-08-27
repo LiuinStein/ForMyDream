@@ -43,3 +43,11 @@ BOOL CSplashDlg::OnInitDialog()
     return TRUE;  // return TRUE unless you set the focus to a control
                   // 异常: OCX 属性页应返回 FALSE
 }
+
+
+BOOL CSplashDlg::PreTranslateMessage(MSG* pMsg)
+{
+    if (pMsg->message == WM_KEYDOWN && (pMsg->wParam == VK_RETURN || pMsg->wParam == VK_ESCAPE))
+        return TRUE;
+    return CDialogEx::PreTranslateMessage(pMsg);
+}

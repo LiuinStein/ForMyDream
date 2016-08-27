@@ -294,3 +294,11 @@ void CForMyDreamDlg::OnDestroy()
     Shell_NotifyIcon(NIM_DELETE, &m_nid); //在托盘区删除图标
     exit(0);
 }
+
+
+BOOL CForMyDreamDlg::PreTranslateMessage(MSG* pMsg)
+{
+    if (pMsg->message == WM_KEYDOWN && (pMsg->wParam == VK_RETURN || pMsg->wParam == VK_ESCAPE))
+        return TRUE;
+    return CDialogEx::PreTranslateMessage(pMsg);
+}
