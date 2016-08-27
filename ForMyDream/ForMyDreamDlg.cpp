@@ -130,17 +130,15 @@ void CForMyDreamDlg::setTextRadioEnable(BOOL __b)
 }
 
 void CForMyDreamDlg::toTray()
-{
-    NOTIFYICONDATA nid;
-    nid.cbSize = static_cast<DWORD>(sizeof(NOTIFYICONDATA));
-    nid.hWnd = this->m_hWnd;
-    nid.uID = IDR_MAINFRAME;
-    nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
-    nid.uCallbackMessage = WM_SHOWTASK;//自定义的消息名称 
-    nid.hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_MAINFRAME));
-    wcscpy_s(nid.szTip, L"监控程序"); //信息提示条 
-    Shell_NotifyIcon(NIM_ADD, &nid); //在托盘区添加图标 
-    ::ShowWindow(this->GetSafeHwnd(), SW_HIDE); //隐藏主窗口
+{ 
+    m_nid.cbSize = static_cast<DWORD>(sizeof(NOTIFYICONDATA));
+    m_nid.hWnd = this->m_hWnd;
+    m_nid.uID = IDR_MAINFRAME;
+    m_nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
+    m_nid.uCallbackMessage = WM_SHOWTASK;//自定义的消息名称 
+    m_nid.hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_MAINFRAME));
+    wcscpy_s(m_nid.szTip, getTimeRemaining()); //信息提示条 
+    Shell_NotifyIcon(NIM_ADD, &m_nid); //在托盘区添加图标 
 }
 
 UINT startShow(LPVOID pParam)
@@ -150,6 +148,19 @@ UINT startShow(LPVOID pParam)
     ::ShowWindow(csdShow.GetSafeHwnd(), SW_SHOW); 
     Sleep(static_cast<CForMyDreamDlg*>(pParam)->m_bySleepTime);
     return 0;
+}
+
+CString CForMyDreamDlg::getTimeRemaining()
+{
+    if (!m_bIsStart)
+        return *(new CString(_T("已暂停")));
+    int iRemainingHour{ m_iTimeRemaining / 3600 };
+    int iRemainingMin{ (m_iTimeRemaining - iRemainingHour * 3600) / 60 };
+    int iRemainingSec{ (m_iTimeRemaining - iRemainingHour * 3600 - iRemainingMin * 60) };
+    CString cstrRemainingTime;
+    cstrRemainingTime.Format(_T("距离下一次显示还有%d小时%d分%d秒"),
+        iRemainingHour, iRemainingMin, iRemainingSec);
+    return cstrRemainingTime;
 }
 
 void CForMyDreamDlg::OnBnClickedRadioSec()
@@ -174,17 +185,7 @@ afx_msg LRESULT CForMyDreamDlg::OnShowtask(WPARAM wParam, LPARAM lParam)
     switch (lParam)
     {
     case WM_LBUTTONDBLCLK: //双击左键的处理 
-    {
-        this->ShowWindow(SW_SHOW);//
-        NOTIFYICONDATA nid;
-        nid.cbSize = static_cast<DWORD>(sizeof(NOTIFYICONDATA));
-        nid.hWnd = this->m_hWnd;
-        nid.uID = IDR_MAINFRAME;
-        nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
-        nid.uCallbackMessage = WM_SHOWTASK; //自定义的消息名称 
-        nid.hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_MAINFRAME));
-        wcscpy_s(nid.szTip, L"Just for my dream"); //信息提示条为“计划任务提醒” 
-    } break;
+        this->ShowWindow(SW_SHOW);break;
     case WM_RBUTTONUP://右键起来时弹出快捷菜单 
     {
         LPPOINT lpoint = new tagPOINT;
@@ -208,6 +209,10 @@ afx_msg LRESULT CForMyDreamDlg::OnShowtask(WPARAM wParam, LPARAM lParam)
         menu.DestroyMenu();
         delete lpoint;
     } break;
+    case WM_MOUSEMOVE:
+        wcscpy_s(m_nid.szTip, getTimeRemaining());
+        Shell_NotifyIcon(NIM_MODIFY, &m_nid); //在托盘区修改图标
+        break;
     default: break;
     }
     return 0;
@@ -215,7 +220,7 @@ afx_msg LRESULT CForMyDreamDlg::OnShowtask(WPARAM wParam, LPARAM lParam)
 
 void CForMyDreamDlg::OnClose()
 {
-    toTray();
+    ShowWindow(SW_HIDE); //隐藏主窗口
 }
 
 afx_msg LRESULT CForMyDreamDlg::OnControlSplash(WPARAM wParam, LPARAM lParam)
@@ -238,8 +243,8 @@ afx_msg LRESULT CForMyDreamDlg::OnControlSplash(WPARAM wParam, LPARAM lParam)
         m_iTimeRemaining = m_bySleepTime / 1000;
         SetDlgItemText(IDOK, _T("暂停"));
         setTextRadioEnable(FALSE);
-        SetTimer(1, 1000, nullptr);
-        toTray();        
+        SetTimer(1, 1000, nullptr); 
+        ShowWindow(SW_HIDE); //隐藏主窗口
     }
     else
     {
@@ -247,6 +252,7 @@ afx_msg LRESULT CForMyDreamDlg::OnControlSplash(WPARAM wParam, LPARAM lParam)
         SetDlgItemText(IDOK, _T("开始"));
         setTextRadioEnable(TRUE);
         KillTimer(1);
+        SetDlgItemText(IDC_TimeRemaining, _T(""));
     }
     return 0;
 }
@@ -273,13 +279,7 @@ void CForMyDreamDlg::OnTimer(UINT_PTR nIDEvent)
         {
             if (--m_iTimeRemaining > m_bySleepTime / 1000)
                 break;
-            int iRemainingHour{ m_iTimeRemaining / 3600 };
-            int iRemainingMin{ (m_iTimeRemaining - iRemainingHour * 3600) / 60 };
-            int iRemainingSec{ (m_iTimeRemaining - iRemainingHour * 3600 - iRemainingMin * 60) };
-            CString cstrRemainingTime;
-            cstrRemainingTime.Format(_T("距离下一次显示还有%d小时%d分%d秒"),
-                iRemainingHour, iRemainingMin, iRemainingSec);
-            SetDlgItemText(IDC_TimeRemaining, cstrRemainingTime);
+            SetDlgItemText(IDC_TimeRemaining, getTimeRemaining());
         }
     }
     default:
@@ -291,5 +291,6 @@ void CForMyDreamDlg::OnTimer(UINT_PTR nIDEvent)
 
 void CForMyDreamDlg::OnDestroy()
 {
+    Shell_NotifyIcon(NIM_DELETE, &m_nid); //在托盘区删除图标
     exit(0);
 }

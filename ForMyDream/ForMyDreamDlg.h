@@ -36,6 +36,7 @@ private:
     int m_iTimeBase; // 时间基数，以秒为单位
     bool m_bIsStart; // 当前监控状态，true为开启              
     int m_iTimeRemaining;  // 剩余时间
+    NOTIFYICONDATA m_nid;
 
 
     // 用于获取文本框数字
@@ -50,6 +51,8 @@ private:
     //开始展示
     friend UINT startShow(LPVOID pParam);
 
+    CString getTimeRemaining();
+
 public:
     afx_msg void OnBnClickedRadioSec();
     afx_msg void OnBnClickedRadioMin();
@@ -57,12 +60,10 @@ public:
     afx_msg void OnTimer(UINT_PTR nIDEvent);
     afx_msg void OnClose();
     afx_msg void OnBnClickedOk();
-
+    afx_msg void OnDestroy();
 
 protected:
     afx_msg LRESULT OnShowtask(WPARAM wParam, LPARAM lParam);  
     afx_msg LRESULT OnControlSplash(WPARAM wParam, LPARAM lParam);
     virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
-public:
-    afx_msg void OnDestroy();
 };
