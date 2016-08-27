@@ -30,13 +30,13 @@ protected:
     afx_msg void OnPaint();
     afx_msg HCURSOR OnQueryDragIcon();
     DECLARE_MESSAGE_MAP()
-public:
-    afx_msg void OnBnClickedOk();
 private:
    
     int m_bySleepTime;  // Splash窗口的显示周期，以毫秒为单位     
     int m_iTimeBase; // 时间基数，以秒为单位
-    bool m_bIsStart; // 当前监控状态，true为开启
+    bool m_bIsStart; // 当前监控状态，true为开启              
+    int m_iTimeRemaining;  // 剩余时间
+
 
     // 用于获取文本框数字
     int getTextNum();
@@ -54,12 +54,15 @@ public:
     afx_msg void OnBnClickedRadioSec();
     afx_msg void OnBnClickedRadioMin();
     afx_msg void OnBnClickedRadioHour();
-    
-protected:
-    afx_msg LRESULT OnShowtask(WPARAM wParam, LPARAM lParam);
-public:
+    afx_msg void OnTimer(UINT_PTR nIDEvent);
     afx_msg void OnClose();
+    afx_msg void OnBnClickedOk();
+
+
 protected:
+    afx_msg LRESULT OnShowtask(WPARAM wParam, LPARAM lParam);  
     afx_msg LRESULT OnControlSplash(WPARAM wParam, LPARAM lParam);
     virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
+public:
+    afx_msg void OnDestroy();
 };

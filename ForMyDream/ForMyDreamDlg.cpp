@@ -16,20 +16,7 @@
 #define WM_SHOWTASK (WM_USER+1)
 #define WM_CONTROLSPLASH (WM_USER+2) 
 
-UINT startShow(LPVOID pParam)
-{
-    while (static_cast<CForMyDreamDlg*>(pParam)->m_bIsStart)
-    {
-        CSplashDlg csdShow;
-        csdShow.DoModal();
-        ::ShowWindow(csdShow.GetSafeHwnd(), SW_SHOW);
-        Sleep(static_cast<CForMyDreamDlg*>(pParam)->m_bySleepTime);
-    }
-    return 0;
-}
-
 // CForMyDreamDlg 对话框
-
 
 
 CForMyDreamDlg::CForMyDreamDlg(CWnd* pParent /*=NULL*/)
@@ -37,6 +24,7 @@ CForMyDreamDlg::CForMyDreamDlg(CWnd* pParent /*=NULL*/)
     , m_bySleepTime(-1)
     , m_iTimeBase(-1)
     , m_bIsStart(false)
+    , m_iTimeRemaining(-1)
 {
     m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -56,6 +44,8 @@ BEGIN_MESSAGE_MAP(CForMyDreamDlg, CDialogEx)
     ON_MESSAGE(WM_SHOWTASK, &CForMyDreamDlg::OnShowtask)
     ON_WM_CLOSE()
     ON_MESSAGE(WM_CONTROLSPLASH, &CForMyDreamDlg::OnControlSplash)
+    ON_WM_TIMER()
+    ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 
@@ -153,6 +143,15 @@ void CForMyDreamDlg::toTray()
     ::ShowWindow(this->GetSafeHwnd(), SW_HIDE); //隐藏主窗口
 }
 
+UINT startShow(LPVOID pParam)
+{
+    CSplashDlg csdShow;
+    csdShow.DoModal();
+    ::ShowWindow(csdShow.GetSafeHwnd(), SW_SHOW); 
+    Sleep(static_cast<CForMyDreamDlg*>(pParam)->m_bySleepTime);
+    return 0;
+}
+
 void CForMyDreamDlg::OnBnClickedRadioSec()
 {
     m_iTimeBase = 1;
@@ -167,7 +166,6 @@ void CForMyDreamDlg::OnBnClickedRadioHour()
 {
     m_iTimeBase = 3600;
 }
-
 
 afx_msg LRESULT CForMyDreamDlg::OnShowtask(WPARAM wParam, LPARAM lParam)
 {
@@ -186,7 +184,6 @@ afx_msg LRESULT CForMyDreamDlg::OnShowtask(WPARAM wParam, LPARAM lParam)
         nid.uCallbackMessage = WM_SHOWTASK; //自定义的消息名称 
         nid.hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_MAINFRAME));
         wcscpy_s(nid.szTip, L"Just for my dream"); //信息提示条为“计划任务提醒” 
-        Shell_NotifyIcon(NIM_DELETE, &nid); //在托盘区删除图标 
     } break;
     case WM_RBUTTONUP://右键起来时弹出快捷菜单 
     {
@@ -216,12 +213,10 @@ afx_msg LRESULT CForMyDreamDlg::OnShowtask(WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
-
 void CForMyDreamDlg::OnClose()
 {
     toTray();
 }
-
 
 afx_msg LRESULT CForMyDreamDlg::OnControlSplash(WPARAM wParam, LPARAM lParam)
 {
@@ -240,25 +235,61 @@ afx_msg LRESULT CForMyDreamDlg::OnControlSplash(WPARAM wParam, LPARAM lParam)
         }
         m_bIsStart = !m_bIsStart;
         m_bySleepTime = m_iTimeBase * 1000 * iInputNum;
+        m_iTimeRemaining = m_bySleepTime / 1000;
         SetDlgItemText(IDOK, _T("暂停"));
         setTextRadioEnable(FALSE);
-        AfxBeginThread(startShow, this);
-        toTray();
-
+        SetTimer(1, 1000, nullptr);
+        toTray();        
     }
     else
     {
         m_bIsStart = !m_bIsStart;
         SetDlgItemText(IDOK, _T("开始"));
         setTextRadioEnable(TRUE);
+        KillTimer(1);
     }
     return 0;
 }
-
 
 BOOL CForMyDreamDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 {
     if (wParam == 10001)
         PostMessageW(WM_CONTROLSPLASH);
     return CDialogEx::OnCommand(wParam, lParam);
+}
+
+void CForMyDreamDlg::OnTimer(UINT_PTR nIDEvent)
+{
+    switch (nIDEvent)
+    {
+    case 1:
+    {
+        if (m_iTimeRemaining <= 0)
+        {
+            AfxBeginThread(startShow, this);
+            m_iTimeRemaining = m_bySleepTime / 1000 + 5;
+        }
+        else
+        {
+            if (--m_iTimeRemaining > m_bySleepTime / 1000)
+                break;
+            int iRemainingHour{ m_iTimeRemaining / 3600 };
+            int iRemainingMin{ (m_iTimeRemaining - iRemainingHour * 3600) / 60 };
+            int iRemainingSec{ (m_iTimeRemaining - iRemainingHour * 3600 - iRemainingMin * 60) };
+            CString cstrRemainingTime;
+            cstrRemainingTime.Format(_T("距离下一次显示还有%d小时%d分%d秒"),
+                iRemainingHour, iRemainingMin, iRemainingSec);
+            SetDlgItemText(IDC_TimeRemaining, cstrRemainingTime);
+        }
+    }
+    default:
+        break;
+    }
+
+    CDialogEx::OnTimer(nIDEvent);
+}
+
+void CForMyDreamDlg::OnDestroy()
+{
+    exit(0);
 }
