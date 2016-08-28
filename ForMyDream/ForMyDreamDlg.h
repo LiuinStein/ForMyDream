@@ -36,6 +36,7 @@ private:
     int m_iTimeBase; // 时间基数，以秒为单位
     bool m_bIsStart; // 当前监控状态，true为开启              
     int m_iTimeRemaining;  // 剩余时间
+    int m_iStopRemainingTime; // 剩余暂停时间
     NOTIFYICONDATA m_nid;
 
 

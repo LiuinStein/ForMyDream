@@ -25,6 +25,7 @@ CForMyDreamDlg::CForMyDreamDlg(CWnd* pParent /*=NULL*/)
     , m_iTimeBase(-1)
     , m_bIsStart(false)
     , m_iTimeRemaining(-1)
+    , m_iStopRemainingTime(120)
 {
     m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -152,14 +153,19 @@ UINT startShow(LPVOID pParam)
 
 CString CForMyDreamDlg::getTimeRemaining()
 {
-    if (!m_bIsStart)
-        return *(new CString(_T("已暂停")));
-    int iRemainingHour{ m_iTimeRemaining / 3600 };
-    int iRemainingMin{ (m_iTimeRemaining - iRemainingHour * 3600) / 60 };
-    int iRemainingSec{ (m_iTimeRemaining - iRemainingHour * 3600 - iRemainingMin * 60) };
     CString cstrRemainingTime;
-    cstrRemainingTime.Format(_T("距离下一次显示还有%d小时%d分%d秒"),
-        iRemainingHour, iRemainingMin, iRemainingSec);
+    int iTimeRemainging{};
+    CString cstrShowBase;
+    if (m_bIsStart)
+        iTimeRemainging = m_iTimeRemaining,
+        cstrShowBase = _T("已开始 - 距离下一次显示还有%d小时%d分%d秒");
+    else
+        iTimeRemainging = m_iStopRemainingTime,
+        cstrShowBase = _T("已暂停 - 距离下一次开始还有%d小时%d分%d秒");
+    int iRemainingHour{ iTimeRemainging / 3600 };
+    int iRemainingMin{ (iTimeRemainging - iRemainingHour * 3600) / 60 };
+    int iRemainingSec{ (iTimeRemainging - iRemainingHour * 3600 - iRemainingMin * 60) };
+    cstrRemainingTime.Format(cstrShowBase, iRemainingHour, iRemainingMin, iRemainingSec);
     return cstrRemainingTime;
 }
 
@@ -243,6 +249,7 @@ afx_msg LRESULT CForMyDreamDlg::OnControlSplash(WPARAM wParam, LPARAM lParam)
         m_iTimeRemaining = m_bySleepTime / 1000;
         SetDlgItemText(IDOK, _T("暂停"));
         setTextRadioEnable(FALSE);
+        KillTimer(2);
         SetTimer(1, 1000, nullptr); 
         ShowWindow(SW_HIDE); //隐藏主窗口
     }
@@ -252,6 +259,7 @@ afx_msg LRESULT CForMyDreamDlg::OnControlSplash(WPARAM wParam, LPARAM lParam)
         SetDlgItemText(IDOK, _T("开始"));
         setTextRadioEnable(TRUE);
         KillTimer(1);
+        SetTimer(2, 1000, nullptr);
         SetDlgItemText(IDC_TimeRemaining, _T(""));
     }
     return 0;
@@ -281,11 +289,21 @@ void CForMyDreamDlg::OnTimer(UINT_PTR nIDEvent)
                 break;
             SetDlgItemText(IDC_TimeRemaining, getTimeRemaining());
         }
-    }
+    }break;
+    case 2:
+    {
+        if (m_iStopRemainingTime <= 0)
+        {
+            m_iStopRemainingTime = 120;
+            PostMessage(WM_CONTROLSPLASH);
+        }
+        else
+            --m_iStopRemainingTime;
+        SetDlgItemText(IDC_TimeRemaining, getTimeRemaining());
+    }break;
     default:
         break;
     }
-
     CDialogEx::OnTimer(nIDEvent);
 }
 
